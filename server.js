@@ -7,13 +7,18 @@ const passport = require('passport')
 const PORT = process.env.PORT || 8000
 const mongoose = require('mongoose')
 
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200
+}
+
 const users = require('./routes/users')
 
 const app = express()
 
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
-app.options('*', cors())
+app.use(cors(corsOptions))
 app.use(express.json())
 
 // Connect DB
