@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const path = require('path')
 require('dotenv').config()
 const passport = require('passport')
 
@@ -41,6 +42,8 @@ mongoose
 app.use(passport.initialize())
 // Passport config
 require('./config/passport')(passport)
+
+app.use(express.static(path.join(__dirname, 'pages')))
 
 // Routes
 app.use('/routes/users', users)
