@@ -1,9 +1,12 @@
 const express = require('express')
+const cookieParser = require('cookie-parser')
+const expressSession = require('express-session')
 const morgan = require('morgan')
 const cors = require('cors')
 const path = require('path')
 require('dotenv').config()
 const passport = require('passport')
+const helmet = require('helmet')
 
 const PORT = process.env.PORT || 8000
 const mongoose = require('mongoose')
@@ -21,6 +24,25 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
 app.use(cors(corsOptions))
 app.use(express.json())
+app.use(helmet())
+app.use(cookieParser())
+app.use(express.json())
+
+/**
+ * Session Configuration
+ */
+const session = {
+  secret: process.env.SESSION_SECRET,
+  cookie: {},
+  resave: false,
+  saveUninitialized: false
+}
+
+if (app.get('env') === 'production') {
+  // Serve secure cookies, requires HTTPS
+  session.cookie.secure = true
+}
+app.use(expressSession(session))
 
 // Connect DB
 mongoose
@@ -47,6 +69,7 @@ app.use(express.static(path.join(__dirname, 'pages')))
 
 // Routes
 app.use('/routes/users', users)
+app.use('/product', require('./routes/product'))
 
 // Error handlers
 
