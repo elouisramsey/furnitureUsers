@@ -13,8 +13,7 @@ const app = express()
 
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
-app.use(cors())
+app.use(cors({ origin: true }))
 app.use(function (req, res, next) {
   let oneof = false
   if (req.headers.origin) {
@@ -46,6 +45,8 @@ app.use(function (req, res, next) {
     next()
   }
 })
+app.use(express.json())
+
 // Connect DB
 mongoose
   .connect(process.env.ATLAS_URI, {
