@@ -22,7 +22,7 @@ app.listen(process.env.PORT || 8000)
 
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(express.json())
 app.use(helmet())
 app.use(cookieParser())
