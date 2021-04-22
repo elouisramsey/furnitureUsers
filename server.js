@@ -9,6 +9,7 @@ const passport = require('passport')
 const helmet = require('helmet')
 
 const mongoose = require('mongoose')
+const MongoStore = require('connect-mongo')
 
 const corsOptions = {
   origin: '*',
@@ -35,7 +36,8 @@ const session = {
   secret: process.env.SESSION_SECRET,
   cookie: {},
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.ATLAS_URI })
 }
 
 if (app.get('env') === 'production') {
