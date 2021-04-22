@@ -8,7 +8,6 @@ require('dotenv').config()
 const passport = require('passport')
 const helmet = require('helmet')
 
-const PORT = process.env.PORT || 8000
 const mongoose = require('mongoose')
 
 const corsOptions = {
@@ -19,6 +18,7 @@ const corsOptions = {
 const users = require('./routes/users')
 
 const app = express()
+app.listen(process.env.PORT || 8000)
 
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
@@ -52,12 +52,6 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true
   })
-  .then(() => console.log('mongoDB is connected'))
-  .then(
-    app.listen(PORT, () => {
-      console.log(`server running on port ${PORT}`)
-    })
-  )
   .catch((err) => console.log(err))
 
 // Passport middleware
