@@ -11,11 +11,6 @@ const helmet = require('helmet')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')
 
-const corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200
-}
-
 const users = require('./routes/users')
 
 const app = express()

@@ -3,6 +3,35 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
+const cloudinary = require('cloudinary').v2
+const { CloudinaryStorage } = require('multer-storage-cloudinary')
+const multer = require('multer')
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
+})
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'users',
+    upload_preset: 'ihe ejigoro',
+    format: async (req, file) => {
+      'jpg', 'png', 'JPG', 'jpeg'
+    }, // supports promises as well
+    public_id: (req, file) => {
+      console.log(
+        new Date().toISOString().replace(/:/g, '-') + file.originalname
+      )
+      return new Date().toISOString().replace(/:/g, '-') + file.originalname
+    }
+  }
+})
+
+const parser = multer({ storage: storage })
+
 // Load input validation
 const validateRegisterInput = require('../validation/register')
 const validateLoginInput = require('../validation/login')
@@ -42,6 +71,33 @@ router.post('/register', (req, res) => {
       })
     }
   })
+})
+
+router.put('/:id', parser.single('image'), async (req, res) => {
+  try {
+    let user = await User.findById(req.params.id)
+
+    // Delete image from cloudinary
+    await cloudinary.uploader.destroy(user.cloudinary_id)
+
+    // Upload image to cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path)
+
+    const data = {
+      nameofvendor: req.body.nameofvendor || user.nameofvendor,
+      avatar: result.secure_url || user.avatar,
+      cloudinary_id: result.public_id || user.cloudinary_id,
+      state: req.body.state || user.state,
+      phone: req.body.phone || user.phone
+    }
+    user = await User.findByIdAndUpdate(req.params.id, data, {
+      new: true
+    })
+    res.json(user)
+    console.log(user)
+  } catch (error) {
+    return res.status(401).send('There was an error editing request.')
+  }
 })
 
 router.post('/login', (req, res) => {

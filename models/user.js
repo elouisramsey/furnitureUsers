@@ -15,6 +15,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    state: { type: String },
+    sex: { type: String },
+    phone: {
+      type: String,
+      trim: true,
+      minlength: 10,
+      maxlength: 10
+    },
+    avatar: {
+      type: String
+    },
     date: {
       type: Date,
       default: Date.now

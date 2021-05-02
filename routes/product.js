@@ -31,7 +31,7 @@ const storage = new CloudinaryStorage({
 const parser = multer({ storage: storage })
 
 // add new product
-router.post('/', parser.array('image'), async (req, res) => {
+router.post('/:id', parser.array('image'), async (req, res) => {
   const {
     description,
     nameofitem,
@@ -41,7 +41,8 @@ router.post('/', parser.array('image'), async (req, res) => {
     price,
     state,
     category,
-    color
+    color,
+    _id
   } = req.body
 
   try {
@@ -51,6 +52,7 @@ router.post('/', parser.array('image'), async (req, res) => {
       nameofitem,
       nameofvendor,
       phone,
+      seller: _id,
       address,
       price,
       state,
@@ -115,34 +117,43 @@ router.delete('/:id', async (req, res) => {
 })
 
 // edit product
-// router.put('/:id', upload.single('image'), async (req, res) => {
-//   try {
-//     let product = await Product.findById(req.params.id)
+router.put('/:id', parser.array('image'), async (req, res) => {
+  try {
+    let product = await Product.findById(req.params.id)
 
-//     await cloudinary.uploader.destroy(product.cloudinary_id)
-//     const result = await cloudinary.uploader.upload(req.file.path, {
-//       upload_preset: 'ihe ejigoro'
-//     })
-//     const data = {
-//       description: req.body.description || product.description,
-//       nameofitem: req.body.nameofitem || product.nameofitem,
-//       nameofvendor: req.body.nameofvendor || product.nameofvendor,
-//       phone: req.body.phone || product.phone,
-//       address: req.body.address || product.address,
-//       price: req.body.price || product.price,
-//       state: req.body.state || product.state,
-//       category: req.body.category || product.category,
-//       files: result.secure_url || product.files,
-//       cloudinary_id: result.public_id || product.cloudinary_id
-//     }
+    await cloudinary.uploader.destroy(product.cloudinary_id)
 
-//     product = await Product.findByIdAndUpdate(req.params.id, data, {
-//       new: true
-//     })
-//     res.json(product)
-//   } catch (err) {
-//     console.log(err)
-//   }
-// })
+    const data = {
+      description: req.body.description || product.description,
+      nameofitem: req.body.nameofitem || product.nameofitem,
+      nameofvendor: req.body.nameofvendor || product.nameofvendor,
+      phone: req.body.phone || product.phone,
+      address: req.body.address || product.address,
+      price: req.body.price || product.price,
+      state: req.body.state || product.state,
+      category: req.body.category || product.category,
+      seller: req.body._id
+    }
+
+    if (req.files) {
+      // if you are adding multiple files at a go
+      const imageURIs = [] // array to hold the image urls
+      const files = req.files // array of images
+      for (const file of files) {
+        const { path } = file
+        imageURIs.push(path)
+      }
+
+      data.image = imageURIs // add the urls to object
+
+      product = await Product.findByIdAndUpdate(req.params.id, data, {
+        new: true
+      })
+      res.json(product)
+    }
+  } catch (err) {
+    return res.status(401).send('There was an error editing request.')
+  }
+})
 
 module.exports = router

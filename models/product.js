@@ -64,11 +64,8 @@ const productSchema = new mongoose.Schema(
       minlength: 3
     },
     seller: {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
-      },
-      username: String
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'users'
     }
   },
   {
