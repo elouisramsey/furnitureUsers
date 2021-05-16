@@ -14,7 +14,7 @@ const MongoStore = require('connect-mongo')
 const users = require('./routes/users')
 
 const app = express()
-app.listen(process.env.PORT || 8000)
+const PORT = process.env.PORT || 8000
 
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
@@ -54,6 +54,12 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true
   })
+  .then(() => console.log('mongoDB is connected'))
+  .then(
+    app.listen(PORT, () => {
+      console.log(`server running on port ${PORT}`)
+    })
+  )
   .catch((err) => console.log(err))
 
 // Passport middleware
@@ -90,12 +96,12 @@ if (app.get('env') === 'development') {
 
 // Production error handler
 // No stacktraces leaked to user
-app.use(function (err, req, res, next) {
-  res.status(err).json(err.status)
-  res.json('error', {
-    message: err.message,
-    error: {}
-  })
-})
+// app.use(function (err, req, res, next) {
+//   res.status(err).json(err.status)
+//   res.json('error', {
+//     message: err.message,
+//     error: {}
+//   })
+// })
 
 module.exports = app

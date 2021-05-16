@@ -31,7 +31,7 @@ const storage = new CloudinaryStorage({
 const parser = multer({ storage: storage })
 
 // add new product
-router.post('/:id', parser.array('image'), async (req, res) => {
+router.post('/', parser.array('image'), async (req, res) => {
   const {
     description,
     nameofitem,
