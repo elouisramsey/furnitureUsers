@@ -77,7 +77,7 @@ router.post('/:id', parser.array('image'), async (req, res) => {
   } catch (err) {
     console.error('server error occur', err.message)
 
-    return res.status(401).send('There was an error creating request.')
+    return res.status(401).send(err.message)
   }
 })
 

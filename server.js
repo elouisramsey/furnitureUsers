@@ -27,9 +27,14 @@ app.use(express.json())
 /**
  * Session Configuration
  */
+app.set('trust proxy', 1) // Cross-Domain Session Cookie
+
 const session = {
   secret: process.env.SESSION_SECRET,
-  cookie: {},
+  cookie: {
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // must be 'none' to enable cross-site delivery
+    secure: process.env.NODE_ENV === 'production' // must be true if sameSite='none'
+  },
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: process.env.ATLAS_URI })
@@ -75,7 +80,7 @@ app.use(function (req, res, next) {
 // Will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function (err, req, res, next) {
-    res.status(err.status || 500)
+    res.status(err).json(err.status)
     res.json('error', {
       message: err.message,
       error: err
@@ -86,7 +91,7 @@ if (app.get('env') === 'development') {
 // Production error handler
 // No stacktraces leaked to user
 app.use(function (err, req, res, next) {
-  res.status(err.status || 500)
+  res.status(err).json(err.status)
   res.json('error', {
     message: err.message,
     error: {}
