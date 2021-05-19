@@ -11,7 +11,7 @@
     "server": "nodemon server.js"
   },
   "engines": {
-    "node": "12.18.4"
+    "node": "14.17.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
